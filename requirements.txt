@@ -1,0 +1,6 @@
+numpy
+pandas
+duckdb
+pytest
+sqlalchemy
+psycopg2-binary

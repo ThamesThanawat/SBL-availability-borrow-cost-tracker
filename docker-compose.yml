@@ -1,0 +1,18 @@
+# Stands up a local Postgres for the SBL tracker in one command:
+#   docker compose up -d
+# Then load data:
+#   PG_DSN=postgresql+psycopg2://sbl:sbl@localhost:5432/sbl python src/load_to_postgres.py
+services:
+  postgres:
+    image: postgres:16
+    container_name: sbl_postgres
+    environment:
+      POSTGRES_USER: sbl
+      POSTGRES_PASSWORD: sbl
+      POSTGRES_DB: sbl
+    ports:
+      - "5432:5432"
+    volumes:
+      - sbl_pgdata:/var/lib/postgresql/data
+volumes:
+  sbl_pgdata:
