@@ -17,6 +17,7 @@ import config as C                       # noqa: E402
 from generate_mock_data import generate  # noqa: E402
 from transform_sbl_data import clean     # noqa: E402
 from metrics import compute_metrics, sector_pressure  # noqa: E402
+from memo_generator import build_memo, write_memo  # noqa: E402
 
 
 @pytest.fixture(scope="module")
@@ -78,3 +79,14 @@ def test_daily_change_uses_lag(data):
     # first observation per symbol has no previous day -> NaN change
     first = data.sort_values(["symbol", "date"]).groupby("symbol").head(1)
     assert first["daily_available_change_pct"].isna().all()
+
+
+def test_memo_write_handles_unicode_symbols(data, tmp_path):
+    memo = build_memo(data)
+    assert "≤" in memo
+    assert "≥" in memo
+
+    path = tmp_path / "memo.md"
+    write_memo(path, memo)
+
+    assert path.read_text(encoding="utf-8") == memo

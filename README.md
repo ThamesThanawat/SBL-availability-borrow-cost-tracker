@@ -40,6 +40,8 @@ Power BI                ->  reads the SQL views (see powerbi/README.md)
 
 ## How to run
 
+Bash / macOS / Linux:
+
 ```bash
 pip install -r requirements.txt
 
@@ -52,6 +54,25 @@ pytest -q
 # 3) primary storage: Postgres via Docker, then load
 docker compose up -d
 PG_DSN=postgresql+psycopg2://sbl:sbl@localhost:5432/sbl python src/load_to_postgres.py
+
+# 4) dashboard: open Power BI Desktop and follow powerbi/README.md
+```
+
+Windows PowerShell:
+
+```powershell
+python -m pip install -r requirements.txt
+
+# 1) full local pipeline (no database needed): CSVs + memo + local DuckDB
+python src/run_pipeline.py
+
+# 2) tests
+python -m pytest -q
+
+# 3) primary storage: Postgres via Docker, then load
+docker compose up -d
+$env:PG_DSN = "postgresql+psycopg2://sbl:sbl@localhost:5432/sbl"
+python src/load_to_postgres.py
 
 # 4) dashboard: open Power BI Desktop and follow powerbi/README.md
 ```
@@ -111,7 +132,9 @@ equations.
 └── tests/                    # metric validation (pool identity, HTB, etc.)
 ```
 
-## Interview talking points
+## Design decisions
+
+These are the main engineering choices behind the project:
 
 - **Why days-to-cover, not short interest:** true short interest is short shares
   / float; borrowed volume includes settlement and arbitrage, and there is no
@@ -133,11 +156,3 @@ Any reference to real short-sale / SBL rules on SET (short-sale eligibility,
 price rules, TSD/broker routing) should be verified against current SET / SEC
 Thailand sources; those rules have changed recently. The analytics here stay on
 mock data.
-
-## CV bullet
-
-- Built a mock Stock Borrowing & Lending analytics stack (Python, pandas, SQL,
-  PostgreSQL, Power BI) that simulates daily borrow data with a realistic
-  data-generating process, computes utilization, borrow-cost changes, a
-  days-to-cover proxy, and a transparent hard-to-borrow flag, and surfaces
-  sales-trading and execution-support views through a Power BI dashboard.

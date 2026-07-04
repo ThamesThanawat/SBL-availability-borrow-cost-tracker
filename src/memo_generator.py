@@ -66,10 +66,14 @@ def build_memo(metrics: pd.DataFrame) -> str:
     return "\n".join(lines)
 
 
+def write_memo(path: str, memo: str) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(memo)
+
+
 if __name__ == "__main__":
     metrics = pd.read_csv(C.METRICS_PATH)
     memo = build_memo(metrics)
-    with open(C.MEMO_PATH, "w") as f:
-        f.write(memo)
+    write_memo(C.MEMO_PATH, memo)
     print(f"Wrote memo -> {C.MEMO_PATH}\n")
     print(memo)

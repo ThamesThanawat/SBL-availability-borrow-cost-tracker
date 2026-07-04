@@ -16,7 +16,7 @@ import config as C
 from generate_mock_data import generate
 from transform_sbl_data import clean
 from metrics import compute_metrics, sector_pressure
-from memo_generator import build_memo
+from memo_generator import build_memo, write_memo
 
 
 def main() -> None:
@@ -35,8 +35,7 @@ def main() -> None:
     print(f"[3/5] metrics : {len(metrics):,} rows -> {C.METRICS_PATH}")
 
     memo = build_memo(metrics)
-    with open(C.MEMO_PATH, "w") as f:
-        f.write(memo)
+    write_memo(C.MEMO_PATH, memo)
     print(f"[4/5] memo    : -> {C.MEMO_PATH}")
 
     # Optional local analytics DB (DuckDB) so SQL / views work without Postgres

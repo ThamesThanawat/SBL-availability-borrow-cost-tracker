@@ -24,6 +24,13 @@ import config as C
 TABLE = "sbl_daily_metrics"
 
 
+def _sql_statements(path: str) -> list[str]:
+    sql = pathlib.Path(path).read_text(encoding="utf-8")
+    uncommented_lines = [line.split("--", 1)[0] for line in sql.splitlines()]
+    uncommented_sql = "\n".join(uncommented_lines)
+    return [stmt.strip() for stmt in uncommented_sql.split(";") if stmt.strip()]
+
+
 def _dsn() -> str:
     if os.getenv("PG_DSN"):
         return os.environ["PG_DSN"]
@@ -39,19 +46,16 @@ def main() -> None:
     metrics = pd.read_csv(C.METRICS_PATH, parse_dates=["date"])
     engine = create_engine(_dsn())
 
-    schema_sql = pathlib.Path("sql/schema.sql").read_text()
-    views_sql = pathlib.Path("sql/views.sql").read_text()
-
     with engine.begin() as con:
         con.execute(text(f"DROP TABLE IF EXISTS {TABLE} CASCADE"))
-        for stmt in filter(str.strip, schema_sql.split(";")):
+        for stmt in _sql_statements("sql/schema.sql"):
             con.execute(text(stmt))
 
     # append rows (table already created by schema.sql)
     metrics.to_sql(TABLE, engine, if_exists="append", index=False)
 
     with engine.begin() as con:
-        for stmt in filter(str.strip, views_sql.split(";")):
+        for stmt in _sql_statements("sql/views.sql"):
             con.execute(text(stmt))
 
     print(f"Loaded {len(metrics):,} rows into Postgres table '{TABLE}' and rebuilt views.")
