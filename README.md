@@ -91,7 +91,7 @@ python src/load_to_postgres.py
 | `hard_to_borrow_flag` | ≥ 2 of 3 axes true | See below. |
 | `sector_pressure_score` | weighted sum of **normalised** avg utilization, avg fee, HTB ratio | Components min-max'd across sectors first. |
 
-### Hard-to-borrow: three independent axes (flag if ≥ 2 true)
+### Hard-to-borrow: three distinct (non-redundant) axes (flag if ≥ 2 true)
 
 - **A — supply tightness:** `utilization_pct ≥ 85`
 - **B — cost:** `borrow_fee_bps ≥ 300`
@@ -100,12 +100,51 @@ python src/load_to_postgres.py
 Momentum escalators (colour / watchlist only, not counted): availability drop
 `≤ −15%`, fee jump `≥ +100 bps`.
 
-*Why three separate axes:* under the pool identity, availability ratio is just
-`1 − utilization`, so a "low availability" test would be the same signal as the
-utilization test. The three axes here answer genuinely different questions —
-how much of the pool is used, how expensive it is, how crowded it is versus
-liquidity — so "2 of 3" is meaningful. (Measured axis correlations on the mock
-data are modest, confirming they are not redundant.)
+*Why three distinct axes — and why they are allowed to correlate:* v1's
+conditions were the **same measurement** in disguise. Under the pool identity
+the availability ratio is exactly `1 − utilization`, so a "low availability"
+test just repeats the utilization test. v2's three axes are **distinct
+measurements** — how much of the pool is on loan (supply tightness), how
+expensive it is (cost), and how crowded the position is versus liquidity
+(crowding). They are **expected to be positively correlated** in a genuinely
+stressed name — the generator deliberately couples the borrow fee to utilization
+— and that co-movement is the point: requiring **2 of 3** makes the flag a
+*confirmation* rule rather than a single noisy trigger. This is **not** a claim
+of statistical independence.
+
+The real numbers are printed by `metrics.htb_diagnostics()` (called from
+`run_pipeline.py`) and change if `config.py` changes. On the current run, the
+pairwise correlations across the full panel are:
+
+| axis pair | correlation |
+|---|---|
+| utilization ↔ fee | 0.58 |
+| utilization ↔ days-to-cover | 0.17 |
+| fee ↔ days-to-cover | 0.18 |
+
+and the per-axis firing rate — the share of panel rows where each condition is
+true — is utilization ≥ 85% → **2.5%**, fee ≥ 300 bps → **14.9%**,
+days-to-cover ≥ 2.0 → **27.9%**. The axes fire at very different rates and only
+moderately together (fee tracks utilization most, as designed), so no pair is
+close to being the same signal — which is what "distinct, not independent"
+means in practice.
+
+### Sector pressure: a cross-sectional, per-snapshot ranking
+
+`sector_pressure_score` is a **relative ranking across sectors on a single
+snapshot date**, not an absolute index. Each component (avg utilization, avg
+fee, HTB ratio) is **min-max scaled across the 10 sectors** before the
+equal-weighted sum, so on every date the calmest sector is forced to ≈ 0 and the
+tightest to ≈ 100 — regardless of whether the day is calm or stressed in
+absolute terms. Two consequences to keep in mind:
+
+- **Not comparable across dates.** A score of 100 today and 100 next week does
+  not mean "equally tight" — 100 only ever means "tightest of the ten *right
+  now*." Do **not** put this score on a time-series visual; chart the raw
+  components (avg utilization, avg fee) for trends over time.
+- **`htb_ratio` is quantized.** Each sector holds only ~3–4 names, so the HTB
+  ratio takes only a few discrete values and one name flipping the flag moves
+  that component by a large step.
 
 ## Data-generating process (the important part)
 
@@ -142,7 +181,9 @@ These are the main engineering choices behind the project:
   intuition) is the honest proxy.
 - **Why the HTB flag changed:** two of the original conditions were the same
   variable in disguise once the pool identity is applied; the flag now uses
-  three independent dimensions.
+  three distinct dimensions (supply tightness, cost, crowding). These are
+  distinct *measurements*, not statistically independent signals — they are
+  expected to co-move in stressed names, and 2-of-3 is a confirmation rule.
 - **Why mean-reverting data:** daily-change and hard-to-borrow clustering only
   make sense on a persistent series; fee is coupled to utilization so tightness
   and cost move together, and a sector factor makes sector pressure a real

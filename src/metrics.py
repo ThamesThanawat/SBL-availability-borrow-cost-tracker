@@ -5,7 +5,11 @@ Computes the analytics layer:
   * utilization, available/borrowed value, days-to-cover proxy
   * daily availability & fee changes (need a persistent series -> LAG per symbol)
   * intermediary spread (borrow fee vs lending rate)
-  * hard-to-borrow flag on THREE INDEPENDENT axes (fixes the v1 redundancy)
+  * hard-to-borrow flag on THREE DISTINCT (non-redundant) axes: v1's conditions
+    were the SAME measurement (availability ratio == 1 - utilization under the
+    pool identity); v2's axes measure genuinely different things (supply
+    tightness, cost, crowding) that are EXPECTED to be positively correlated in
+    stressed names, so 2-of-3 acts as a confirmation rule
   * sector borrow-pressure score with cross-sector NORMALISATION before summing
 """
 
@@ -42,7 +46,10 @@ def compute_metrics(df: pd.DataFrame) -> pd.DataFrame:
     )
     df["daily_fee_change_bps"] = df["borrow_fee_bps"] - g["borrow_fee_bps"].shift(1)
 
-    # --- hard-to-borrow: three independent axes, flag if >= 2 true ----------
+    # --- hard-to-borrow: three distinct axes, flag if >= 2 true -------------
+    # Distinct = different measurements, NOT uncorrelated. Fee is coupled to
+    # utilization in the generator, so A and B are expected to co-move in
+    # stressed names; 2-of-3 is a confirmation rule (see htb_diagnostics()).
     axis_a = df["utilization_pct"] >= C.HTB_UTIL_PCT          # supply tightness
     axis_b = df["borrow_fee_bps"] >= C.HTB_FEE_BPS            # cost
     axis_c = df["days_to_cover_proxy"] >= C.HTB_DTC           # crowding
@@ -119,6 +126,44 @@ def sector_pressure(df: pd.DataFrame, on_date=None) -> pd.DataFrame:
     return agg.sort_values("sector_pressure_score", ascending=False).reset_index(drop=True)
 
 
+# ----------------------------------------------------------------------------
+# Hard-to-borrow diagnostics: publish the REAL numbers behind the "distinct,
+# not independent" framing -- the pairwise correlations of the three axes and
+# the firing rate of each axis (share of rows where its condition is true), on
+# the full panel and on the latest snapshot. run_pipeline calls this so the
+# figures print on every run; they change if config.py changes.
+# ----------------------------------------------------------------------------
+def htb_diagnostics(df: pd.DataFrame) -> dict:
+    axis_cols = ["utilization_pct", "borrow_fee_bps", "days_to_cover_proxy"]
+    corr = df[axis_cols].corr()
+
+    def _firing(frame: pd.DataFrame) -> dict:
+        return {
+            f"A  util >= {C.HTB_UTIL_PCT:.0f}%":   float((frame["utilization_pct"] >= C.HTB_UTIL_PCT).mean()),
+            f"B  fee  >= {C.HTB_FEE_BPS:.0f} bps": float((frame["borrow_fee_bps"] >= C.HTB_FEE_BPS).mean()),
+            f"C  dtc  >= {C.HTB_DTC:.1f}":         float((frame["days_to_cover_proxy"] >= C.HTB_DTC).mean()),
+        }
+
+    latest_date = df["date"].max()
+    panel_firing = _firing(df)
+    latest_firing = _firing(df[df["date"] == latest_date])
+
+    print("\nHTB axis correlations (full panel) -- distinct measurements, "
+          "expected to co-move, not orthogonal:")
+    print(corr.round(3).to_string())
+    print("\nHTB axis firing rates (share of rows where the condition is true):")
+    print(f"  {'axis':20s}{'full panel':>12s}{'latest snap':>14s}")
+    for key in panel_firing:
+        print(f"  {key:20s}{panel_firing[key]:>12.3f}{latest_firing[key]:>14.3f}")
+
+    return {
+        "correlations": corr,
+        "firing_panel": panel_firing,
+        "firing_latest": latest_firing,
+        "latest_date": latest_date,
+    }
+
+
 if __name__ == "__main__":
     clean = pd.read_csv(C.CLEAN_PATH)
     metrics = compute_metrics(clean)
@@ -133,3 +178,5 @@ if __name__ == "__main__":
           f"{int(latest['hard_to_borrow_flag'].sum())} hard-to-borrow names")
     print("\nTop sectors by pressure:")
     print(sect[["sector", "sector_pressure_score"]].head(3).to_string(index=False))
+
+    htb_diagnostics(metrics)

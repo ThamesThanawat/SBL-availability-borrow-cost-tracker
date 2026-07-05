@@ -60,12 +60,14 @@ def test_htb_flag_matches_two_of_three(data):
     assert (data["hard_to_borrow_flag"] == expected).all()
 
 
-def test_htb_axes_are_not_redundant(data):
-    # sanity: the three axes should not be near-perfectly correlated,
-    # which is the whole point of the v1 -> v2 fix.
+def test_htb_axes_are_distinct(data):
+    # The three axes are DISTINCT measurements, not statistically orthogonal.
+    # Positive correlation up to this bound is EXPECTED by design (fee is
+    # coupled to utilization in the generator), so this guards only against two
+    # axes collapsing into the SAME measurement -- not against correlation.
     corr = data[["utilization_pct", "borrow_fee_bps", "days_to_cover_proxy"]].corr()
     off_diag = corr.values[np.triu_indices(3, k=1)]
-    assert (np.abs(off_diag) < 0.98).all()
+    assert (np.abs(off_diag) < 0.9).all()
 
 
 def test_sector_pressure_normalised(data):

@@ -16,13 +16,17 @@ END_DATE = "2026-06-30"     # last trading date (mock)
 
 # ----------------------------------------------------------------------------
 # Universe: real SET ticker names, but ALL borrow data below is simulated.
-# 4 names per sector, 10 sectors.
+# 4 names per sector, 10 sectors (ICT temporarily holds 3 — see note below —
+# until a verified replacement is added).
 # ----------------------------------------------------------------------------
 UNIVERSE: dict[str, list[str]] = {
     "Banking":         ["KBANK", "SCB", "BBL", "KTB"],
     "Energy":          ["PTT", "PTTEP", "GULF", "GPSC"],
     "Commerce":        ["CPALL", "HMPRO", "CRC", "BJC"],
-    "ICT":             ["ADVANC", "TRUE", "INTUCH", "JMART"],
+    # INTUCH removed: delisted from SET 1 Apr 2025, amalgamated into GULF
+    # (Gulf Development) — GULF is already in the Energy list above, so keeping
+    # INTUCH would double-count the same merged entity. Left at 3 names for now.
+    "ICT":             ["ADVANC", "TRUE", "JMART"],
     "Healthcare":      ["BDMS", "BH", "BCH", "CHG"],
     "Property":        ["LH", "AP", "SPALI", "ORI"],
     "Transportation":  ["AOT", "BEM", "BTS", "THAI"],
@@ -74,7 +78,10 @@ DQ_DUPLICATE_RATE = 0.004
 # ----------------------------------------------------------------------------
 # Metric thresholds (see PRD v2 section 8)
 # ----------------------------------------------------------------------------
-# Hard-to-borrow: three INDEPENDENT axes; flag if >= 2 are true.
+# Hard-to-borrow: three DISTINCT (non-redundant) axes; flag if >= 2 are true.
+# They are separate MEASUREMENTS (supply tightness, cost, crowding), not a claim
+# of statistical orthogonality — fee is deliberately coupled to utilization in
+# the generator, so these are expected to co-move in stressed names.
 HTB_UTIL_PCT = 85.0         # Axis A: supply tightness (utilization %)
 HTB_FEE_BPS = 300.0         # Axis B: cost
 HTB_DTC = 2.0               # Axis C: crowding (days-to-cover proxy)

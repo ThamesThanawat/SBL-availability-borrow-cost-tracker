@@ -48,6 +48,15 @@ SWITCH(TRUE(),
 pressure (use `v_sector_pressure`). Table: top-10 utilization from
 `v_latest_snapshot`.
 
+> **Sector pressure is a per-snapshot ranking, not a time series.**
+> `sector_pressure_score` min-max scales each component across the 10 sectors on
+> the selected date, so the calmest sector is always ≈ 0 and the tightest ≈ 100
+> regardless of absolute conditions. Use it only on the single-date bar chart —
+> never on a line/trend visual, and do not compare a sector's score across
+> dates. (`htb_ratio` is also quantized: ~3–4 names per sector, so one flag is a
+> large step.) For trends over time, chart the raw `avg_utilization` /
+> `avg_fee_bps` instead.
+
 **Page 2 — Stock Detail.** Slicer on `symbol`. Cards for the latest snapshot
 (utilization, fee, days-to-cover, collateral %, HTB status). Line charts over
 `date` for available qty, fee, utilization, days-to-cover. A text box bound to

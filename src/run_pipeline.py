@@ -15,7 +15,7 @@ import duckdb
 import config as C
 from generate_mock_data import generate
 from transform_sbl_data import clean
-from metrics import compute_metrics, sector_pressure
+from metrics import compute_metrics, sector_pressure, htb_diagnostics
 from memo_generator import build_memo, write_memo
 
 
@@ -50,6 +50,10 @@ def main() -> None:
     """)
     con.close()
     print(f"[5/5] duckdb  : -> {C.DUCKDB_PATH}")
+
+    # Diagnostics: publish the real HTB axis correlations & firing rates so the
+    # "distinct, not independent" claim is backed by numbers on every run.
+    htb_diagnostics(metrics)
 
 
 if __name__ == "__main__":

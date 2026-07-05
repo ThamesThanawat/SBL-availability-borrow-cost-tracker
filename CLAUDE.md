@@ -74,10 +74,13 @@ The Postgres path is separate and optional (the DuckDB and Postgres views mirror
   duplicates, repairs negatives via the pool identity, forward/back-fills fee+rate together, and
   rewrites `data_quality_note` to `repaired`. `data_quality_note` drives the handling.
 
-- **Hard-to-borrow flag = ≥ 2 of 3 *independent* axes** (util ≥ 85%, fee ≥ 300 bps, days-to-cover
-  ≥ 2.0). The three axes are deliberately non-redundant — a "low availability" test would just be
-  `1 − utilization` again. `test_htb_axes_are_not_redundant` guards this. Availability-drop and
-  fee-spike are **momentum escalators** for colour/watchlist only; they do NOT count toward the 2-of-3.
+- **Hard-to-borrow flag = ≥ 2 of 3 *distinct* axes** (util ≥ 85%, fee ≥ 300 bps, days-to-cover
+  ≥ 2.0). The three axes are deliberately non-redundant *measurements* — a "low availability" test
+  would just be `1 − utilization` again — but they are NOT claimed to be statistically independent:
+  fee is coupled to utilization in the generator, so they co-move in stressed names and 2-of-3 acts
+  as a confirmation rule (`metrics.htb_diagnostics()` prints the real correlations and firing rates).
+  `test_htb_axes_are_distinct` guards this. Availability-drop and fee-spike are **momentum
+  escalators** for colour/watchlist only; they do NOT count toward the 2-of-3.
 
 - **Sector pressure normalises before summing.** `sector_pressure()` min-max scales avg utilization,
   avg fee, and HTB ratio **across sectors** first, then takes the equal-weighted sum (`C.SECTOR_WEIGHTS`),
