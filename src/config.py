@@ -11,8 +11,8 @@ from __future__ import annotations
 # Reproducibility & horizon
 # ----------------------------------------------------------------------------
 SEED = 42
-N_DAYS = 90                 # business days of history to generate
-START_DATE = "2025-01-02"   # first trading date (mock)
+START_DATE = "2026-01-01"   # first trading date (mock)
+END_DATE = "2026-06-30"     # last trading date (mock)
 
 # ----------------------------------------------------------------------------
 # Universe: real SET ticker names, but ALL borrow data below is simulated.
@@ -63,7 +63,7 @@ COLLATERAL_PCT = (105.0, 150.0)
 # Price & liquidity
 PRICE_START = (5.0, 400.0)  # per-symbol starting close price (THB)
 PRICE_VOL = 0.02            # daily lognormal price vol
-ADV_BASE = (2e7, 2e9)       # per-symbol average daily traded value (THB), log-uniform
+ADV_BASE = (6.5e7, 5e9)     # per-symbol average daily traded value (THB), log-uniform
 ADV_SIGMA = 0.25            # daily lognormal noise on ADV
 
 # Data-quality injection (so the cleaning step has real work to do)
@@ -80,7 +80,7 @@ HTB_FEE_BPS = 300.0         # Axis B: cost
 HTB_DTC = 2.0               # Axis C: crowding (days-to-cover proxy)
 
 # Momentum escalators (do NOT count toward 2-of-3; add colour / watchlist)
-ESC_AVAIL_DROP_PCT = -30.0  # daily availability change <= -30%
+ESC_AVAIL_DROP_PCT = -15.0  # daily availability change <= -15%
 ESC_FEE_JUMP_BPS = 100.0    # daily fee change >= +100 bps
 
 # Sector pressure weights (must sum to 1.0)

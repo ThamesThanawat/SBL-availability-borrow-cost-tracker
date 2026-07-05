@@ -44,7 +44,7 @@ def generate() -> pd.DataFrame:
 
     symbols = [(s, sec) for sec, names in C.UNIVERSE.items() for s in names]
     sectors = list(C.UNIVERSE.keys())
-    dates = pd.bdate_range(C.START_DATE, periods=C.N_DAYS)
+    dates = pd.bdate_range(C.START_DATE, C.END_DATE)
 
     # --- per-symbol structural parameters -----------------------------------
     params = {}

@@ -98,7 +98,7 @@ python src/load_to_postgres.py
 - **C — crowding:** `days_to_cover_proxy ≥ 2.0`
 
 Momentum escalators (colour / watchlist only, not counted): availability drop
-`≤ −30%`, fee jump `≥ +100 bps`.
+`≤ −15%`, fee jump `≥ +100 bps`.
 
 *Why three separate axes:* under the pool identity, availability ratio is just
 `1 − utilization`, so a "low availability" test would be the same signal as the

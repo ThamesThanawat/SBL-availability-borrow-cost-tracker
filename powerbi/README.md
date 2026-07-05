@@ -33,7 +33,7 @@ Total Available Borrow Value = SUM(sbl_daily_metrics[available_borrow_value])
 Avg Borrow Fee (bps)         = AVERAGE(sbl_daily_metrics[borrow_fee_bps])
 Avg Utilization %            = AVERAGE(sbl_daily_metrics[utilization_pct])
 # Hard-to-Borrow  = CALCULATE(DISTINCTCOUNT(sbl_daily_metrics[symbol]), sbl_daily_metrics[hard_to_borrow_flag] = TRUE)
-# Declining Avail = CALCULATE(DISTINCTCOUNT(sbl_daily_metrics[symbol]), sbl_daily_metrics[daily_available_change_pct] <= -30)
+# Declining Avail = CALCULATE(DISTINCTCOUNT(sbl_daily_metrics[symbol]), sbl_daily_metrics[daily_available_change_pct] <= -15)
 
 HTB Colour =
 SWITCH(TRUE(),
@@ -45,9 +45,8 @@ SWITCH(TRUE(),
 ## 4. Pages (match the PRD)
 
 **Page 1 — Market Overview.** KPI cards (the five measures above). Bar: sector
-pressure (use `v_sector_pressure_inputs`, or bring the pipeline's
-`sbl_sector_pressure.csv` for the normalised score). Table: top-10 utilization
-from `v_latest_snapshot`.
+pressure (use `v_sector_pressure`). Table: top-10 utilization from
+`v_latest_snapshot`.
 
 **Page 2 — Stock Detail.** Slicer on `symbol`. Cards for the latest snapshot
 (utilization, fee, days-to-cover, collateral %, HTB status). Line charts over
