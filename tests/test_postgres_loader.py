@@ -13,8 +13,9 @@ from load_to_postgres import _sql_statements  # noqa: E402
 def test_views_sql_parser_ignores_comment_semicolons():
     statements = _sql_statements("sql/views.sql")
 
-    assert len(statements) == 3
+    assert len(statements) == 4
     assert all(stmt.startswith("CREATE OR REPLACE VIEW") for stmt in statements)
+    assert any("v_sector_pressure AS" in stmt for stmt in statements)
 
 
 def test_schema_sql_parser_ignores_comment_lines():

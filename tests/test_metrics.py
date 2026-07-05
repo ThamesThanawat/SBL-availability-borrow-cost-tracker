@@ -70,8 +70,8 @@ def test_htb_axes_are_not_redundant(data):
 
 def test_sector_pressure_normalised(data):
     sect = sector_pressure(data)
-    # equal-weight sum of three min-max [0,1] components -> within [0,1]
-    assert sect["sector_pressure_score"].between(-1e-9, 1 + 1e-9).all()
+    # equal-weight sum of three min-max components, reported on a 0-100 scale
+    assert sect["sector_pressure_score"].between(-1e-9, 100 + 1e-9).all()
     assert len(sect) == len(C.UNIVERSE)
 
 

@@ -106,10 +106,14 @@ def sector_pressure(df: pd.DataFrame, on_date=None) -> pd.DataFrame:
     agg["n_htb"] = _minmax(agg["htb_ratio"])
 
     w = C.SECTOR_WEIGHTS
+    # 0-100 scale must match sql/views.sql::v_sector_pressure.
     agg["sector_pressure_score"] = (
-        w["utilization"] * agg["n_util"]
-        + w["fee"] * agg["n_fee"]
-        + w["htb_ratio"] * agg["n_htb"]
+        100.0
+        * (
+            w["utilization"] * agg["n_util"]
+            + w["fee"] * agg["n_fee"]
+            + w["htb_ratio"] * agg["n_htb"]
+        )
     )
     agg["date"] = on_date
     return agg.sort_values("sector_pressure_score", ascending=False).reset_index(drop=True)
