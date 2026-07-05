@@ -3,3 +3,8 @@ __pycache__/
 .pytest_cache/
 data/processed/*.duckdb
 .DS_Store
+CLAUDE.md
+AGENTS.md
+AGENT.md
+.claude/
+.cursor/
