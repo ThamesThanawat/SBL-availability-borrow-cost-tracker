@@ -89,7 +89,21 @@ python src/load_to_postgres.py
 | `daily_fee_change_bps` | day-over-day change in fee | Momentum in cost. |
 | `intermediary_spread_bps` | `borrow_fee_bps − lending_rate_bps` | Agent's cut; borrower pays ≥ lender earns. |
 | `hard_to_borrow_flag` | ≥ 2 of 3 axes true | See below. |
+| `short_eligible` | symbol is in the official SET100 list for H1 2026 | Period-matched to the dataset. |
 | `sector_pressure_score` | weighted sum of **normalised** avg utilization, avg fee, HTB ratio | Components min-max'd across sectors first. |
+
+### Short-sale eligibility
+
+Under SET's post-Feb-2025 short-sale rule, short selling is limited to SET100
+constituents. For this dataset, `short_eligible` reflects membership in the
+official SET100 constituent list for the exact dataset period: H1 2026
+(1 Jan - 30 Jun 2026). The eligibility list is period-matched: an H1 dataset
+must use the H1 SET100 list.
+
+ORI and THAI remain in the simulated universe to demonstrate the concept, but
+they are **not** SET100 constituents for H1 2026, so they are flagged
+`short_eligible = False`. THAI only rejoined the SET Index in Aug 2025 and does
+not enter SET100 until H2 2026.
 
 ### Hard-to-borrow: three distinct (non-redundant) axes (flag if ≥ 2 true)
 

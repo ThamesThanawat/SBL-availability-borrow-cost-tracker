@@ -23,6 +23,8 @@ import config as C
 def compute_metrics(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df = df.sort_values(["symbol", "date"]).reset_index(drop=True)
+    set100_h1_2026 = set(C.SET100_H1_2026)
+    df["short_eligible"] = df["symbol"].isin(set100_h1_2026)
 
     # --- levels -------------------------------------------------------------
     df["utilization_pct"] = 100.0 * df["borrowed_qty"] / df["total_lendable_qty"]

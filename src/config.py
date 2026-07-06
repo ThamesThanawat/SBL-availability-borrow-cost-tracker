@@ -16,24 +16,40 @@ END_DATE = "2026-06-30"     # last trading date (mock)
 
 # ----------------------------------------------------------------------------
 # Universe: real SET ticker names, but ALL borrow data below is simulated.
-# 4 names per sector, 10 sectors (ICT temporarily holds 3 — see note below —
-# until a verified replacement is added).
+# 4 names per sector, 10 sectors (Information & Communication Technology
+# temporarily holds 3 -- see note below -- until a verified replacement is added).
 # ----------------------------------------------------------------------------
 UNIVERSE: dict[str, list[str]] = {
     "Banking":         ["KBANK", "SCB", "BBL", "KTB"],
-    "Energy":          ["PTT", "PTTEP", "GULF", "GPSC"],
+    "Energy & Utilities": ["PTT", "PTTEP", "GULF", "GPSC"],
     "Commerce":        ["CPALL", "HMPRO", "CRC", "BJC"],
     # INTUCH removed: delisted from SET 1 Apr 2025, amalgamated into GULF
-    # (Gulf Development) — GULF is already in the Energy list above, so keeping
+    # (Gulf Development) -- GULF is already in Energy & Utilities, so keeping
     # INTUCH would double-count the same merged entity. Left at 3 names for now.
-    "ICT":             ["ADVANC", "TRUE", "JMART"],
-    "Healthcare":      ["BDMS", "BH", "BCH", "CHG"],
-    "Property":        ["LH", "AP", "SPALI", "ORI"],
-    "Transportation":  ["AOT", "BEM", "BTS", "THAI"],
+    "Information & Communication Technology": ["ADVANC", "TRUE", "JMART"],
+    "Health Care Services": ["BDMS", "BH", "BCH", "CHG"],
+    "Property Development": ["LH", "AP", "SPALI", "ORI"],
+    "Transportation & Logistics": ["AOT", "BEM", "BTS", "THAI"],
     "Food & Beverage": ["CPF", "TU", "OSP", "CBG"],
-    "Finance":         ["MTC", "SAWAD", "TIDLOR", "KTC"],
+    "Finance & Securities": ["MTC", "SAWAD", "TIDLOR", "KTC"],
+    # TODO: 'Industrials' is not a real SET sector; its members span Construction Materials (SCC, TASCO), Packaging (SCGP), and Personal Products & Pharmaceuticals (STGT). Revisit.
     "Industrials":     ["SCC", "SCGP", "TASCO", "STGT"],
 }
+
+# Source: SET official constituent list, effective 1 Jan - 30 Jun 2026,
+# https://media.set.or.th/set/Documents/2025/Dec/SET50_100_H1_2026.pdf
+SET100_H1_2026 = [
+    "AAV", "ADVANC", "AEONTS", "AMATA", "AOT", "AP", "AURA", "AWC", "BA", "BAM",
+    "BANPU", "BBL", "BCH", "BCP", "BCPG", "BDMS", "BEM", "BGRIM", "BH", "BJC",
+    "BLA", "BTG", "BTS", "CBG", "CCET", "CENTEL", "CHG", "CK", "COM7", "CPALL",
+    "CPF", "CPN", "CRC", "DELTA", "DOHOME", "EA", "EGCO", "ERW", "GFPT", "GLOBAL",
+    "GPSC", "GULF", "GUNKUL", "HANA", "HMPRO", "ICHI", "IRPC", "IVL", "JAS", "JMART",
+    "JMT", "JTS", "KBANK", "KCE", "KKP", "KTB", "KTC", "LH", "M", "MEGA",
+    "MINT", "MOSHI", "MTC", "OR", "OSP", "PLANB", "PR9", "PRM", "PTG", "PTT",
+    "PTTEP", "PTTGC", "QH", "RATCH", "RCL", "SAWAD", "SCB", "SCC", "SCGP", "SIRI",
+    "SISB", "SJWD", "SPALI", "SPRC", "STA", "STECON", "STGT", "TASCO", "TCAP", "TFG",
+    "TIDLOR", "TISCO", "TLI", "TOA", "TOP", "TRUE", "TTB", "TU", "VGI", "WHA",
+]
 
 # ----------------------------------------------------------------------------
 # Data-generating process (see PRD v2 section 7.4)

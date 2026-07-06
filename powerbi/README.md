@@ -12,9 +12,10 @@ screenshots in the root README.
 ## 1. Connect to data
 
 **Option A — Postgres (primary).** Home → Get Data → PostgreSQL database.
-Server `localhost:5432`, Database `sbl`. Import mode. Load the three views:
-`v_latest_snapshot`, `v_sector_pressure_inputs`, `v_hard_to_borrow`, and the
-base table `sbl_daily_metrics` (for time-series pages).
+Server `localhost:5432`, Database `sbl`. Import mode. Load the four views:
+`v_latest_snapshot`, `v_sector_pressure`, `v_sector_pressure_inputs`,
+`v_hard_to_borrow`, and the base table `sbl_daily_metrics` (for time-series
+pages).
 
 **Option B — CSV (quick start, no DB).** Get Data → Text/CSV →
 `data/processed/sbl_analytics.csv` and `sbl_sector_pressure.csv`.
@@ -58,14 +59,17 @@ pressure (use `v_sector_pressure`). Table: top-10 utilization from
 > `avg_fee_bps` instead.
 
 **Page 2 — Stock Detail.** Slicer on `symbol`. Cards for the latest snapshot
-(utilization, fee, days-to-cover, collateral %, HTB status). Line charts over
-`date` for available qty, fee, utilization, days-to-cover. A text box bound to
-`hard_to_borrow_reason` for the auto risk note.
+(utilization, fee, days-to-cover, collateral %, HTB status, short-sale
+eligibility). Line charts over `date` for available qty, fee, utilization,
+days-to-cover. A text box bound to `hard_to_borrow_reason` for the auto risk
+note.
 
 **Page 3 — Hard-to-Borrow Monitor.** Table from `v_hard_to_borrow` with
 conditional formatting driven by `HTB Colour` (red flagged / amber watchlist /
-green clear). Add ranking visuals: highest utilization, largest fee increase,
-largest availability decline, highest days-to-cover.
+green clear). Include `short_eligible` as a column, since borrow tightness is
+only actionable for short-sale execution on eligible names. Add ranking visuals:
+highest utilization, largest fee increase, largest availability decline,
+highest days-to-cover.
 
 **Page 4 — Sales-Trading Memo.** A card/multi-row card reproducing
 `reports/sbl_sales_trading_memo.md`, or a text box for the narrative.

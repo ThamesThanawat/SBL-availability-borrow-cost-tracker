@@ -41,7 +41,8 @@ ORDER BY sector_pressure_score DESC;
 CREATE OR REPLACE VIEW v_hard_to_borrow AS
 SELECT date, symbol, sector, available_borrow_qty, borrow_fee_bps,
        utilization_pct, days_to_cover_proxy,
-       daily_available_change_pct, daily_fee_change_bps, hard_to_borrow_reason
+       daily_available_change_pct, daily_fee_change_bps, short_eligible,
+       hard_to_borrow_reason
 FROM v_latest_snapshot
 WHERE hard_to_borrow_flag = TRUE
 ORDER BY utilization_pct DESC;

@@ -2,7 +2,8 @@
 CREATE TABLE sbl_daily_metrics (
   date                        DATE        NOT NULL,
   symbol                      VARCHAR(16) NOT NULL,
-  sector                      VARCHAR(32) NOT NULL,
+  sector                      VARCHAR(64) NOT NULL,
+  short_eligible              BOOLEAN,
   available_borrow_qty        BIGINT,
   total_lendable_qty          BIGINT,
   borrowed_qty                BIGINT,

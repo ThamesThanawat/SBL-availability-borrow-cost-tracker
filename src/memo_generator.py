@@ -60,6 +60,8 @@ def build_memo(metrics: pd.DataFrame) -> str:
         "## Execution implication",
         "- Check borrow availability and cost before discussing short exposure "
         "or structured trades on the flagged names.",
+        "- Short-sale execution implications apply only to short-eligible names; "
+        "flagged names that are not short-eligible are informational only.",
         "- Names with tightening availability or spiking fees may require "
         "pre-locate discussion ahead of short-sale execution.",
     ]
