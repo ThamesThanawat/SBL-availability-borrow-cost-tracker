@@ -31,7 +31,7 @@ norm AS (
   FROM agg
 )
 SELECT sector, avg_utilization, avg_fee_bps, htb_ratio,
-       -- weights below MUST match config.SECTOR_WEIGHTS
+       -- WEIGHTS: must stay in sync with config.SECTOR_WEIGHTS. If you change weights there, update them here too. The Python/SQL parity test will fail if these diverge.
        100.0 * ( (1.0/3.0) * COALESCE(n_util, 0)
                + (1.0/3.0) * COALESCE(n_fee, 0)
                + (1.0/3.0) * COALESCE(n_htb, 0) ) AS sector_pressure_score

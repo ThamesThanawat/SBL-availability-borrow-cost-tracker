@@ -83,7 +83,7 @@ COLLATERAL_PCT = (105.0, 150.0)
 # Price & liquidity
 PRICE_START = (5.0, 400.0)  # per-symbol starting close price (THB)
 PRICE_VOL = 0.02            # daily lognormal price vol
-ADV_BASE = (6.5e7, 5e9)     # per-symbol average daily traded value (THB), log-uniform
+ADV_BASE = (1.2e8, 5e9)     # per-symbol average daily traded value (THB), log-uniform
 ADV_SIGMA = 0.25            # daily lognormal noise on ADV
 
 # Data-quality injection (so the cleaning step has real work to do)

@@ -33,11 +33,14 @@ def test_short_eligible_has_no_nulls_and_is_boolean():
     assert pd.api.types.is_bool_dtype(metrics["short_eligible"])
 
 
-def test_ori_and_thai_are_short_ineligible_when_present():
+def test_ori_and_thai_are_short_ineligible():
     metrics = _metrics()
     present = set(metrics["symbol"])
 
-    for symbol in {"ORI", "THAI"} & present:
+    expected = {"ORI", "THAI"}
+    assert expected <= present
+
+    for symbol in expected:
         assert not metrics.loc[metrics["symbol"] == symbol, "short_eligible"].any()
 
 
@@ -45,6 +48,9 @@ def test_known_set100_universe_names_are_short_eligible():
     metrics = _metrics()
     present = set(metrics["symbol"])
 
-    for symbol in {"KBANK", "PTT", "ADVANC", "JMART"} & present:
+    expected = {"KBANK", "PTT", "ADVANC", "JMART"}
+    assert expected <= present
+
+    for symbol in expected:
         assert symbol in C.SET100_H1_2026
         assert metrics.loc[metrics["symbol"] == symbol, "short_eligible"].all()

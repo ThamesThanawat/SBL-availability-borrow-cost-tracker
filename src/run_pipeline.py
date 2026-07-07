@@ -10,6 +10,8 @@ after this, once a Postgres instance is up (see docker-compose.yml).
 
 from __future__ import annotations
 
+import pathlib
+
 import duckdb
 
 import config as C
@@ -17,6 +19,13 @@ from generate_mock_data import generate
 from transform_sbl_data import clean
 from metrics import compute_metrics, sector_pressure, htb_diagnostics
 from memo_generator import build_memo, write_memo
+
+
+def _sql_statements(path: str) -> list[str]:
+    sql = pathlib.Path(path).read_text(encoding="utf-8")
+    uncommented_lines = [line.split("--", 1)[0] for line in sql.splitlines()]
+    uncommented_sql = "\n".join(uncommented_lines)
+    return [stmt.strip() for stmt in uncommented_sql.split(";") if stmt.strip()]
 
 
 def main() -> None:
@@ -43,11 +52,8 @@ def main() -> None:
     con.execute("DROP TABLE IF EXISTS sbl_daily_metrics")
     con.register("m", metrics)
     con.execute("CREATE TABLE sbl_daily_metrics AS SELECT * FROM m")
-    con.execute("""
-        CREATE OR REPLACE VIEW v_latest_snapshot AS
-        SELECT * FROM sbl_daily_metrics
-        WHERE date = (SELECT MAX(date) FROM sbl_daily_metrics)
-    """)
+    for stmt in _sql_statements("sql/views.sql"):
+        con.execute(stmt)
     con.close()
     print(f"[5/5] duckdb  : -> {C.DUCKDB_PATH}")
 
