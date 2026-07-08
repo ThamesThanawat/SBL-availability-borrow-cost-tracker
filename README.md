@@ -10,6 +10,14 @@ Power BI dashboard, with an auto-generated sales-trading memo.
 > does not use real broker, exchange, custodian, or client data.** Ticker names
 > are real SET symbols, but all borrow/lending figures are generated.
 
+## Dashboard
+
+Built in Power BI on the PostgreSQL views; all data shown is simulated.
+
+![Market Overview - KPIs, sector borrow pressure, hard-to-borrow trend](powerbi/page1-market-overview.png)
+
+![Stock Detail - single-name borrow metrics and time series](powerbi/page2-stock-detail.png)
+
 ## Why this exists
 
 In sales trading and execution, short-selling depends on whether a name can be
